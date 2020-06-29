@@ -118,7 +118,7 @@ const FoodDetails: React.FC = () => {
   }
 
   function handleDecrementFood(): void {
-    if (foodQuantity > 0) {
+    if (foodQuantity > 1) {
       setFoodQuantity(foodQuantity - 1);
     }
   }
@@ -136,16 +136,17 @@ const FoodDetails: React.FC = () => {
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
-    return formatValue(
+    const value =
       food.price * foodQuantity +
-        extras.reduce((acc, extra) => {
-          return acc + extra.quantity * extra.value;
-        }, 0),
-    );
+      extras.reduce((acc, extra) => {
+        return acc + extra.quantity * extra.value;
+      }, 0);
+    return formatValue(value > 0 ? value : 0);
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {
-    // Finish the order and save on the API
+    await api.post('orders', { ...food, product_id: food.id, id: null });
+    navigation.navigate('Orders');
   }
 
   // Calculate the correct icon name
